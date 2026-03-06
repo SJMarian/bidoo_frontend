@@ -4,7 +4,6 @@ import { authGuard } from '../auth/authGuard'
 
 // Views
 const Home = () => import('../views/Home.vue')
-const Login = () => import('../views/Login.vue')
 const Dashboard = () => import('../views/Dashboard.vue')
 
 const routes: Array<RouteRecordRaw> = [
@@ -17,7 +16,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/login',
     name: 'Login',
-    component: Login,
+    component: () => import('../views/auth/Login.vue'),
     meta: { requiresAuth: false },
   },
   {

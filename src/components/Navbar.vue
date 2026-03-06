@@ -16,16 +16,27 @@
       <span class="logo-text">Elite Auction</span>
     </div>
     <nav class="nav-links">
+      <a href="#how-it-works">How it Works</a>
       <a href="#live-auctions">Live Auctions</a>
+      <a href="#support">Support</a>
     </nav>
     <div class="nav-actions">
-      <router-link to="/login" class="btn-nav-signin">Sign In</router-link>
+      <router-link v-if="!isLoginRoute" to="/login" class="btn-nav-signin">Sign In</router-link>
+      <router-link v-if="!isRegisterRoute" to="/register" class="btn-nav-register"
+        >Register</router-link
+      >
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
-// Navbar component logic
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
+const isLoginRoute = computed(() => route.path === '/login')
+const isRegisterRoute = computed(() => route.path === '/register')
 </script>
 
 <style scoped>
@@ -76,6 +87,21 @@
 }
 
 .btn-nav-signin:hover {
+  background-color: #dbeafe;
+}
+
+.btn-nav-register {
+  padding: 0.5rem 1.25rem;
+  border-radius: 6px;
+  background-color: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.2s;
+  font-size: 0.95rem;
+}
+
+.btn-nav-register:hover {
   background-color: #dbeafe;
 }
 
