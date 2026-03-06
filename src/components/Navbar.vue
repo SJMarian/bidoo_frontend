@@ -1,18 +1,7 @@
 <template>
   <header class="navbar">
     <div class="logo">
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 4C16.41 4 20 7.59 20 12H12V4Z"
-          fill="#1d4ed8"
-        />
-      </svg>
+      <Gavel class="logo-icon" :size="24" />
       <span class="logo-text">Elite Auction</span>
     </div>
     <nav class="nav-links">
@@ -32,6 +21,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { Gavel } from 'lucide-vue-next'
 
 const route = useRoute()
 
