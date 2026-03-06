@@ -218,58 +218,7 @@
       </div>
     </main>
 
-    <footer class="footer">
-      <div class="trust-badges">
-        <div class="badge">
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1ZM12 10.99V6L10.5 7.5L9 6V10.99H12ZM14.5 16C15.88 16 17 14.88 17 13.5C17 12.12 15.88 11 14.5 11C13.12 11 12 12.12 12 13.5V16H14.5Z"
-              fill="#6b7280"
-            />
-          </svg>
-          <span>AES-256 BIT<br />Encryption</span>
-        </div>
-        <div class="badge">
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1ZM10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z"
-              fill="#6b7280"
-            />
-          </svg>
-          <span>KYC VERIFIED<br />Bidders Only</span>
-        </div>
-        <div class="badge">
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1ZM12 16C10.34 16 9 14.66 9 13C9 11.34 10.34 10 12 10C13.66 10 15 11.34 15 13C15 14.66 13.66 16 12 16ZM12 11.5C11.17 11.5 10.5 12.17 10.5 13C10.5 13.83 11.17 14.5 12 14.5C12.83 14.5 13.5 13.83 13.5 13C13.5 12.17 12.83 11.5 12 11.5Z"
-              fill="#6b7280"
-            />
-          </svg>
-          <span>SECURE<br />Privacy Policy</span>
-        </div>
-      </div>
-      <p class="copyright">
-        © 2024 Elite Auction Group, LLC. All rights reserved. Licensed and Bonded Auctioneer.
-      </p>
-    </footer>
+    <AuthFooter />
   </div>
 </template>
 
@@ -279,6 +228,7 @@ import Navbar from '../../components/Navbar.vue'
 import { useRouter } from 'vue-router'
 import { authService } from '../../auth/authService'
 import { useAuthStore } from '../../auth/authStore'
+import AuthFooter from '../../components/AuthFooter.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
