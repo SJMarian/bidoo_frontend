@@ -7,7 +7,7 @@
           <h1>Active Bids Dashboard</h1>
           <p>Real-time updates for your active auctions and recent activity.</p>
         </div>
-        <button class="btn-primary">
+        <button class="btn-primary" @click="router.push('/dashboard/create-auction')">
           <PlusCircle class="btn-icon" :size="20" /> Create New Auction
         </button>
       </header>
@@ -59,8 +59,12 @@
 </template>
 
 <script setup lang="ts">
+import { useRouter } from 'vue-router'
 import AppNavbar from '../components/AppNavbar.vue'
+import BidSummaryRow from '../components/BidSummaryRow.vue'
 import { PlusCircle } from 'lucide-vue-next'
+
+const router = useRouter()
 </script>
 
 <style scoped>

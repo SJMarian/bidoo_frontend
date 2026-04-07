@@ -37,6 +37,12 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/MyBids.vue'),
     meta: { requiresAuth: true },
   },
+  {
+    path: '/dashboard/create-auction',
+    name: 'CreateAuction',
+    component: () => import('../views/CreateAuction.vue'),
+    meta: { requiresAuth: true },
+  },
 ]
 
 const router = createRouter({
