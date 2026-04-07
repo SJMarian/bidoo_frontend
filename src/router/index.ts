@@ -8,12 +8,6 @@ const Dashboard = () => import('../views/Dashboard.vue')
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/',
-    name: 'Home',
-    component: Home,
-    meta: { requiresAuth: false },
-  },
-  {
     path: '/login',
     name: 'Login',
     component: () => import('../views/auth/Login.vue'),
@@ -26,7 +20,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: false },
   },
   {
-    path: '/dashboard',
+    path: '/',
     name: 'Dashboard',
     component: Dashboard,
     meta: { requiresAuth: true },
