@@ -1,7 +1,7 @@
 <template>
   <header class="app-navbar">
     <div class="navbar-left">
-      <router-link to="/dashboard" class="logo">
+      <router-link to="/" class="logo">
         <div class="logo-icon-wrapper">
           <Gavel class="logo-icon" :size="20" />
         </div>
@@ -20,7 +20,7 @@
         <a href="#">Past</a>
         <router-link to="/dashboard/my-bids" active-class="active">My Bids</router-link>
       </nav>
-      
+
       <div class="nav-actions">
         <button class="btn-notification">
           <Bell class="notification-icon" :size="20" />
@@ -35,7 +35,8 @@
 <script setup lang="ts">
 import { Gavel, Search, Bell } from 'lucide-vue-next'
 
-const avatarUrl = 'https://lh3.googleusercontent.com/aida-public/AB6AXuBszEKXIGZtIP5YLt-hDHcCqOuQnejkwaVm7A9DEe7cD3zPoS0tuHKS2OLlzu5-wxP8XYSUd4ytO89NuVOhjlCUJH-AKf0U1mttmUtxURYFGKIDjDklxKi8VPesf6E6WnfL7MXi8m5PUWMNHJO84a1dlvRzmtwzcLSm3a9v9J9PdJiRrMmYvgcUaQTJ7elryDsK6zEvi0PNS3Ystp8TcIaaMR3pplROo4vz-gB4kyqRAJGRP1asFl10V8_PM10SYF-8Je7NJBIbh70'
+const avatarUrl =
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuBszEKXIGZtIP5YLt-hDHcCqOuQnejkwaVm7A9DEe7cD3zPoS0tuHKS2OLlzu5-wxP8XYSUd4ytO89NuVOhjlCUJH-AKf0U1mttmUtxURYFGKIDjDklxKi8VPesf6E6WnfL7MXi8m5PUWMNHJO84a1dlvRzmtwzcLSm3a9v9J9PdJiRrMmYvgcUaQTJ7elryDsK6zEvi0PNS3Ystp8TcIaaMR3pplROo4vz-gB4kyqRAJGRP1asFl10V8_PM10SYF-8Je7NJBIbh70'
 </script>
 
 <style scoped>
@@ -54,7 +55,8 @@ const avatarUrl = 'https://lh3.googleusercontent.com/aida-public/AB6AXuBszEKXIGZ
   }
 }
 
-.navbar-left, .navbar-right {
+.navbar-left,
+.navbar-right {
   display: flex;
   align-items: center;
   gap: 2rem;
@@ -189,7 +191,8 @@ const avatarUrl = 'https://lh3.googleusercontent.com/aida-public/AB6AXuBszEKXIGZ
 }
 
 @media (max-width: 768px) {
-  .search-bar, .nav-links {
+  .search-bar,
+  .nav-links {
     display: none;
   }
 }

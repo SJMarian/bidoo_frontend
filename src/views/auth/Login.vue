@@ -123,7 +123,7 @@ const handleLogin = async () => {
     authStore.setAuth(response.data.token)
 
     // Redirect to dashboard
-    router.push('/dashboard')
+    router.push('/')
   } catch (err: any) {
     console.error('Login failed:', err)
     error.value = err?.response?.data?.message || 'Invalid credentials. Please try again.'

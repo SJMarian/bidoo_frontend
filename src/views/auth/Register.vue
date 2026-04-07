@@ -269,7 +269,7 @@ const handleRegister = async () => {
     authStore.setAuth(response.data.token)
 
     // Redirect to dashboard
-    router.push('/dashboard')
+    router.push('/')
   } catch (err: any) {
     console.error('Registration failed:', err)
     error.value = err?.response?.data?.message || 'Failed to create account. Please try again.'
