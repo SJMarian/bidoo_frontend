@@ -7,7 +7,7 @@
           <h1>Active Bids Dashboard</h1>
           <p>Real-time updates for your active auctions and recent activity.</p>
         </div>
-        <button class="btn-primary" @click="router.push('/dashboard/create-auction')">
+        <button class="btn-primary" @click="router.push('/home/create-auction')">
           <PlusCircle class="btn-icon" :size="20" /> Create New Auction
         </button>
       </header>

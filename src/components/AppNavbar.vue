@@ -18,7 +18,7 @@
         <a href="#" class="active">Live</a>
         <a href="#">Upcoming</a>
         <a href="#">Past</a>
-        <router-link to="/dashboard/my-bids" active-class="active">My Bids</router-link>
+        <router-link to="/home/my-bids" active-class="active">My Bids</router-link>
       </nav>
 
       <div class="nav-actions">
@@ -26,17 +26,27 @@
           <Bell class="notification-icon" :size="20" />
         </button>
         <router-link to="/profile" class="btn-profile">Profile</router-link>
-        <div class="avatar" :style="{ backgroundImage: 'url(' + avatarUrl + ')' }"></div>
+
+        <button class="btn-notification">
+          <LogOut class="" @click="logout" :size="20" />
+        </button>
       </div>
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
-import { Gavel, Search, Bell } from 'lucide-vue-next'
+import { Gavel, Search, Bell, LogOut } from 'lucide-vue-next'
+import { useAuthStore } from '../auth/authStore'
+import { useRouter } from 'vue-router'
 
-const avatarUrl =
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuBszEKXIGZtIP5YLt-hDHcCqOuQnejkwaVm7A9DEe7cD3zPoS0tuHKS2OLlzu5-wxP8XYSUd4ytO89NuVOhjlCUJH-AKf0U1mttmUtxURYFGKIDjDklxKi8VPesf6E6WnfL7MXi8m5PUWMNHJO84a1dlvRzmtwzcLSm3a9v9J9PdJiRrMmYvgcUaQTJ7elryDsK6zEvi0PNS3Ystp8TcIaaMR3pplROo4vz-gB4kyqRAJGRP1asFl10V8_PM10SYF-8Je7NJBIbh70'
+const authStore = useAuthStore()
+const router = useRouter()
+
+const logout = () => {
+  authStore.logout()
+  router.push('/login')
+}
 </script>
 
 <style scoped>

@@ -230,7 +230,7 @@ const submitForm = async () => {
     })
 
     toast.success('Auction submitted successfully!')
-    router.push('/dashboard/my-bids')
+    router.push('/home/my-bids')
   } catch (err: any) {
     console.error('Failed to create auction:', err)
     const message =

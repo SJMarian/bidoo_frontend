@@ -4,37 +4,40 @@ import { authGuard } from '../auth/authGuard'
 
 // Views
 const Home = () => import('../views/Home.vue')
-const Dashboard = () => import('../views/Dashboard.vue')
+const Login = () => import('../views/auth/Login.vue')
+const Register = () => import('../views/auth/Register.vue')
+const MyBids = () => import('../views/MyBids.vue')
+const CreateAuction = () => import('../views/CreateAuction.vue')
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/login',
     name: 'Login',
-    component: () => import('../views/auth/Login.vue'),
+    component: Login,
     meta: { requiresAuth: false },
   },
   {
     path: '/register',
     name: 'Register',
-    component: () => import('../views/auth/Register.vue'),
+    component: Register,
     meta: { requiresAuth: false },
   },
   {
     path: '/',
-    name: 'Dashboard',
-    component: Dashboard,
+    name: 'Home',
+    component: Home,
     meta: { requiresAuth: true },
   },
   {
-    path: '/dashboard/my-bids',
+    path: '/home/my-bids',
     name: 'MyBids',
-    component: () => import('../views/MyBids.vue'),
+    component: MyBids,
     meta: { requiresAuth: true },
   },
   {
-    path: '/dashboard/create-auction',
+    path: '/home/create-auction',
     name: 'CreateAuction',
-    component: () => import('../views/CreateAuction.vue'),
+    component: CreateAuction,
     meta: { requiresAuth: true },
   },
 ]
