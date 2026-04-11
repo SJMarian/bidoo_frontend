@@ -6,8 +6,27 @@
         <h1>Dashboard</h1>
       </div>
       <div class="content-body">
-        <p>Protected area. Welcome, <strong>{{ authStore.user?.email || 'User' }}</strong>!</p>
-        <button class="logout-btn" @click="logout">Logout</button>
+        <p>
+          Protected area. Welcome, <strong>{{ authStore.user?.email || 'User' }}</strong
+          >!
+        </p>
+        <button class="logout-btn" @click="logout">Logout.</button>
+      </div>
+
+      <div class="demo-auctions">
+        <h2>Auction Items</h2>
+        <div class="auction-grid">
+          <AuctionItemCard
+            title="Vintage Rolex Submariner"
+            description="Rare 1980s Rolex Submariner in excellent condition with original box and papers."
+            imageUrl="https://images.unsplash.com/photo-1523170335258-f5ed11844a49?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+            :currentBid="12500"
+            :bidsCount="14"
+            :isLive="true"
+            @bid="handleBid"
+            :bidIncrement="500"
+          />
+        </div>
       </div>
     </main>
   </div>
@@ -17,6 +36,7 @@
 import { useAuthStore } from '../auth/authStore'
 import { useRouter } from 'vue-router'
 import AppNavbar from '../components/AppNavbar.vue'
+import AuctionItemCard from '../components/AuctionItemCard.vue'
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -24,6 +44,10 @@ const router = useRouter()
 const logout = () => {
   authStore.logout()
   router.push('/login')
+}
+
+const handleBid = (amount: number) => {
+  alert(`Bid of $${amount} placed!`)
 }
 </script>
 
@@ -53,7 +77,7 @@ const logout = () => {
   background: white;
   padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .content-body p {
@@ -75,5 +99,22 @@ const logout = () => {
 
 .logout-btn:hover {
   background-color: #dc2626;
+}
+
+.demo-auctions {
+  margin-top: 3rem;
+}
+
+.demo-auctions h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+}
+
+.auction-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
 }
 </style>
