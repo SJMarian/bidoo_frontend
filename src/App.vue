@@ -1,6 +1,11 @@
 <script setup lang="ts">
+import { AuctionCountdown } from '@/components/countdown'
 import HelloWorld from './components/HelloWorld.vue'
 import TheWelcome from './components/TheWelcome.vue'
+import { NotificationBell, NotificationToast } from '@/components/notification'
+
+// Replace 1 with your actual logged-in user's ID when you add authentication
+const currentUserId = 1
 </script>
 
 <template>
@@ -10,16 +15,25 @@ import TheWelcome from './components/TheWelcome.vue'
     <div class="wrapper">
       <HelloWorld msg="Bidoo" />
     </div>
+
+    <!-- Notification bell sits in the header -->
+    <NotificationBell :user-id="currentUserId" />
   </header>
 
   <main>
     <TheWelcome />
+    <AuctionCountdown :auction-id="1" />
   </main>
+
+  <!-- Toast floats above everything, place it once at the bottom of the template -->
+  <NotificationToast :user-id="currentUserId" />
 </template>
 
 <style scoped>
 header {
   line-height: 1.5;
+  display: flex;
+  align-items: center;
 }
 
 .logo {
