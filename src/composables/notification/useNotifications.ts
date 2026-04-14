@@ -44,6 +44,28 @@ export function useNotifications(userId: number) {
     }
   }
 
+  /** Accept a notification */
+  async function acceptNotification(notificationId: number): Promise<void> {
+    try {
+      const updated = await notificationApi.acceptNotification(notificationId, userId)
+      const idx = notifications.value.findIndex((n) => n.id === notificationId)
+      if (idx !== -1) notifications.value[idx] = updated
+    } catch (e: any) {
+      error.value = e.message ?? 'Failed to accept notification'
+    }
+  }
+
+  /** Reject a notification */
+  async function rejectNotification(notificationId: number): Promise<void> {
+    try {
+      const updated = await notificationApi.rejectNotification(notificationId, userId)
+      const idx = notifications.value.findIndex((n) => n.id === notificationId)
+      if (idx !== -1) notifications.value[idx] = updated
+    } catch (e: any) {
+      error.value = e.message ?? 'Failed to reject notification'
+    }
+  }
+
   /** Mark all notifications as read */
   async function markAllAsRead(): Promise<void> {
     try {
@@ -71,8 +93,14 @@ export function useNotifications(userId: number) {
   }
 
   // Connect WebSocket and register callback
-  notificationWS.connect(userId)
-  const unsubscribe = notificationWS.onNotification(handleIncoming)
+  let unsubscribe = () => {}
+  try {
+    notificationWS.connect(userId)
+    unsubscribe = notificationWS.onNotification(handleIncoming)
+  } catch (e) {
+    console.error('[useNotifications] Failed to initialize WebSocket:', e)
+    // Continue without WebSocket - notifications will still work via polling
+  }
 
   // Initial load
   fetchAll()
@@ -91,6 +119,8 @@ export function useNotifications(userId: number) {
     fetchAll,
     markAsRead,
     markAllAsRead,
+    acceptNotification,
+    rejectNotification,
     remove,
   }
 }

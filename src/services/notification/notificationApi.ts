@@ -56,6 +56,22 @@ export const notificationApi = {
     return handleResponse<Notification>(res)
   },
 
+  /** Accept a notification */
+  async acceptNotification(notificationId: number, userId: number): Promise<Notification> {
+    const res = await fetch(`${BASE_URL}/${notificationId}/accept?userId=${userId}`, {
+      method: 'PATCH',
+    })
+    return handleResponse<Notification>(res)
+  },
+
+  /** Reject a notification */
+  async rejectNotification(notificationId: number, userId: number): Promise<Notification> {
+    const res = await fetch(`${BASE_URL}/${notificationId}/reject?userId=${userId}`, {
+      method: 'PATCH',
+    })
+    return handleResponse<Notification>(res)
+  },
+
   /** Mark all notifications as read */
   async markAllAsRead(userId: number): Promise<{ updated: number; message: string }> {
     const res = await fetch(`${BASE_URL}/read-all?userId=${userId}`, {

@@ -26,6 +26,16 @@ function pad(n: number): string {
   return String(Math.floor(n)).padStart(2, '0')
 }
 
+/**
+ * Get the WebSocket endpoint URL.
+ * SockJS expects an HTTP URL, not a ws:// URL.
+ * It will handle the protocol upgrade internally.
+ */
+function getWebSocketUrl(): string {
+  // Use HTTP URL for the SockJS endpoint
+  return 'http://localhost:8080/ws'
+}
+
 function msToCountdownParts(ms: number): CountdownParts {
   if (ms <= 0) {
     return { hours: '00', minutes: '00', seconds: '00', totalSeconds: 0, isFinalTen: false, isExpired: true }
@@ -104,7 +114,8 @@ export function useCountdown(auctionId: number) {
   // ── WebSocket ─────────────────────────────────────────────────────────────────
 
   function connectWebSocket() {
-    const socket = new SockJS('http://localhost:8080/ws')
+    const wsUrl = getWebSocketUrl()
+    const socket = new SockJS(wsUrl)
     stompClient = Stomp.over(socket)
     stompClient.debug = import.meta.env.DEV ? console.log : () => {}
 
@@ -114,6 +125,8 @@ export function useCountdown(auctionId: number) {
         const event: AuctionStateChangeEvent = JSON.parse(frame.body)
         handleStateChange(event)
       })
+    }, (error: any) => {
+      console.error('[Countdown] WebSocket connection error:', error)
     })
   }
 

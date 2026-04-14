@@ -47,14 +47,24 @@ class NotificationWebSocketService {
 
         // Subscribe to the user-specific notification queue
         // Backend sends to: /user/{userId}/queue/notifications
-        this.stompClient.subscribe('/user/queue/notifications', (frame: any) => {
-          try {
-            const notification: Notification = JSON.parse(frame.body)
-            this.subscribers.forEach((cb) => cb(notification))
-          } catch (e) {
-            console.error('[Notifications] Failed to parse notification frame:', e)
+        try {
+          if (this.stompClient && this.stompClient.connected) {
+            this.stompClient.subscribe('/user/queue/notifications', (frame: any) => {
+              try {
+                const notification: Notification = JSON.parse(frame.body)
+                this.subscribers.forEach((cb) => cb(notification))
+              } catch (e) {
+                console.error('[Notifications] Failed to parse notification frame:', e)
+              }
+            })
+          } else {
+            console.warn('[Notifications] STOMP client not properly connected, will retry')
+            setTimeout(() => this.connect(userId), 1000)
           }
-        })
+        } catch (e) {
+          console.error('[Notifications] Failed to subscribe:', e)
+          setTimeout(() => this.connect(userId), 1000)
+        }
       },
       (error: any) => {
         console.error('[Notifications] WebSocket error:', error)

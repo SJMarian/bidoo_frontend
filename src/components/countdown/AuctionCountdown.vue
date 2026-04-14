@@ -76,8 +76,14 @@ import { computed, ref, watch } from 'vue'
 import { useCountdown } from '@/composables/countdown/useCountdown'
 
 const props = defineProps<{ auctionId: number }>()
+const emit = defineEmits<{
+  (e: 'stateChange', auctionId: number, newState: string): void
+}>()
 
 const { state, countdown, winner } = useCountdown(props.auctionId)
+watch(state, (newState) => {
+  emit('stateChange', props.auctionId, newState)
+})
 
 // Only show hours column when there's at least 1 hour remaining
 const showHours = computed(() => parseInt(countdown.value.hours) > 0)

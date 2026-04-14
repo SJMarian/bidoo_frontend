@@ -17,7 +17,11 @@ export interface Notification {
   message: string
   auctionTitle: string | null
   auctionId: number | null
+  amount?: number | string // Payment amount for AUCTION_WON
+  finalPrice?: number | string // Auction final price
   read: boolean
+  accepted: boolean | null
+  rejected: boolean | null
   createdAt: string // ISO 8601
 }
 

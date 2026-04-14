@@ -54,8 +54,11 @@ function show(notification: Notification) {
 function dismiss(id: number) {
   const idx = toasts.value.findIndex((t) => t.id === id)
   if (idx !== -1) {
-    clearTimeout(toasts.value[idx].timer)
-    toasts.value.splice(idx, 1)
+    const toast = toasts.value[idx]
+    if (toast) {
+      clearTimeout(toast.timer)
+      toasts.value.splice(idx, 1)
+    }
   }
 }
 
