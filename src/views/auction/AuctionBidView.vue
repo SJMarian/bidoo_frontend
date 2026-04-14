@@ -32,14 +32,14 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import BidIncrementPanel from '../../components/auction/BidIncrementPanel.vue'
 import IncrementRuleEditor from '../../components/auction/IncrementRuleEditor.vue'
 import { bidApi } from '../../services/bidApi'
-import type { BidStateResponse } from '../types/bid'
+import type { BidStateResponse } from '../../types/bid'
 
-// In a real app, auctionId comes from route params: useRoute().params.id
-// Here we default to 1 for demo purposes
-const auctionId = 1
+const route = useRoute()
+const auctionId = Number(route.params.id ?? 4) || 4
 
 const showAdmin = ref(false)
 const bidState = ref<BidStateResponse | null>(null)
@@ -61,12 +61,13 @@ async function onRuleUpdated() {
 .bid-page {
   min-height: 100vh;
   background: var(--color-bg);
-  padding: 2rem;
-  max-width: 900px;
+  padding: 3rem 1.5rem;
+  max-width: 1200px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  justify-content: center;
 }
 
 .bid-page__header {
@@ -106,12 +107,15 @@ async function onRuleUpdated() {
   display: flex;
   gap: 1.5rem;
   align-items: flex-start;
+  justify-content: center;
   flex-wrap: wrap;
+  width: 100%;
 }
 
 .admin-panel {
   flex: 1;
-  min-width: 280px;
+  min-width: 320px;
+  max-width: 420px;
   display: flex;
   flex-direction: column;
   gap: 1rem;

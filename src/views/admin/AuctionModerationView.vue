@@ -180,7 +180,7 @@ import { ref, computed, reactive, onMounted } from 'vue'
 import AuctionModerationCard from '../../components/admin/AuctionModerationCard.vue'
 import ConfirmModal from '../../components/admin/ConfirmModal.vue'
 import { adminModerationApi } from '../../services/adminModerationApi'
-import type { Auction, AuctionStatus } from '../types/auction'
+import type { Auction, AuctionStatus } from '../../types/auction'
 
 // ── State ────────────────────────────────────────────────────────────────────
 

@@ -276,7 +276,9 @@ function formatTime(iso: string): string {
   border: 1px solid var(--color-border);
   border-radius: 14px;
   padding: 1.5rem;
-  max-width: 480px;
+  width: 100%;
+  max-width: 760px;
+  min-width: 320px;
 }
 
 /* ── Bid Amount Display ── */

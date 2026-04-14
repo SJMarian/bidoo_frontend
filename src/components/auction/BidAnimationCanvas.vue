@@ -5,8 +5,8 @@
       ref="canvasRef"
       class="bid-anim-canvas"
       :class="{ hidden: !riveReady }"
-      width="200"
-      height="200"
+      width="360"
+      height="360"
     />
 
     <!--
@@ -80,13 +80,13 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 120px;
-  height: 120px;
+  width: 360px;
+  height: 360px;
 }
 
 .bid-anim-canvas {
-  width: 120px;
-  height: 120px;
+  width: 360px;
+  height: 360px;
 }
 .bid-anim-canvas.hidden {
   display: none;
@@ -104,14 +104,14 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 80px;
-  height: 80px;
+  width: 240px;
+  height: 240px;
   border-radius: 50%;
   transition: all 0.3s ease;
 }
 
 .icon {
-  font-size: 2.5rem;
+  font-size: 7.5rem;
   line-height: 1;
 }
 
