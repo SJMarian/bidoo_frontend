@@ -15,29 +15,29 @@
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-header">
-            <span class="stat-title">Total Bids</span>
+            <span class="stat-title">Total items</span>
           </div>
-          <div class="stat-value">0</div>
+          <div class="stat-value">{{ totalBids }}</div>
           <div class="stat-desc">Past 30 days</div>
         </div>
         <div class="stat-card">
           <div class="stat-header">
             <span class="stat-title">Active Winning</span>
           </div>
-          <div class="stat-value">0</div>
+          <div class="stat-value">{{ winningBids }}</div>
         </div>
         <div class="stat-card">
           <div class="stat-header">
             <span class="stat-title">Outbid</span>
           </div>
-          <div class="stat-value">0</div>
+          <div class="stat-value">{{ outbidBids }}</div>
           <div class="stat-desc">Action required</div>
         </div>
       </div>
 
       <div class="table-container">
         <div class="table-header">
-          <h2>Bids Summary</h2>
+          <h2>Items Summary</h2>
         </div>
         <div class="table-responsive">
           <table class="bids-table">
@@ -50,7 +50,19 @@
                 <th>Action</th>
               </tr>
             </thead>
-            <tbody></tbody>
+            <tbody>
+              <BidSummaryRow
+                v-for="bid in activeBids"
+                :key="bid.id"
+                :image-url="getImageUrl(bid.image)"
+                :item-name="bid.title"
+                :current-bid="formatCurrency(bid.currentHighestBid)"
+                :status="mapStatus(bid.status)"
+                :time-left="formatTimeLeft(bid.timeLeft)"
+                :action-type="getActionType(bid.status)"
+                @action-click="handleActionClick(bid)"
+              />
+            </tbody>
           </table>
         </div>
       </div>
@@ -59,12 +71,92 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import AppNavbar from '../components/AppNavbar.vue'
 import BidSummaryRow from '../components/BidSummaryRow.vue'
 import { PlusCircle } from 'lucide-vue-next'
+import apiClient from '../api/apiClient'
 
 const router = useRouter()
+
+interface AuctionItemResponse {
+  id: number
+  title: string
+  description: string
+  image: string
+  currentHighestBid: number
+  status: string
+  timeLeft: number
+}
+
+const activeBids = ref<AuctionItemResponse[]>([])
+
+const fetchBids = async () => {
+  try {
+    const response = await apiClient.get('auction/items-mine')
+    if (response.data && Array.isArray(response.data.data)) {
+      activeBids.value = response.data.data
+    } else if (Array.isArray(response.data)) {
+      activeBids.value = response.data
+    } else if (response.data && Array.isArray(response.data.content)) {
+      activeBids.value = response.data.content
+    } else {
+      console.log('No items founds')
+      activeBids.value = []
+    }
+  } catch (error) {
+    console.error('Failed to fetch user bids:', error)
+  }
+}
+
+onMounted(() => {
+  fetchBids()
+})
+
+const getImageUrl = (image: string | null) => {
+  if (!image) return ''
+  if (image.startsWith('http')) return image
+
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1/'
+  const host = baseUrl.replace(/\/api\/v1\/?$/, '')
+  return `${host}/${image.startsWith('/') ? image.substring(1) : image}`
+}
+
+const formatCurrency = (amount: number) => {
+  if (amount == null) return '$0.00'
+  return `$${amount.toFixed(2)}`
+}
+
+const formatTimeLeft = (seconds: number) => {
+  if (seconds == null) return 'N/A'
+  if (seconds <= 0) return 'Ended'
+  const h = Math.floor(seconds / 3600)
+  const m = Math.floor((seconds % 3600) / 60)
+  const s = Math.floor(seconds % 60)
+  return `${h > 0 ? h + 'h ' : ''}${m}m ${s}s`
+}
+
+const mapStatus = (status: string) => {
+  // BidSummaryRow expects 'winning' or 'outbid'.
+  return status === 'LIVE' ? 'winning' : 'outbid'
+}
+
+const getActionType = (status: string) => {
+  return status === 'LIVE' ? 'bid' : 'view'
+}
+
+const handleActionClick = (bid: AuctionItemResponse) => {
+  router.push(`/home/auction/${bid.id}`)
+}
+
+const totalBids = computed(() => activeBids.value.length)
+const winningBids = computed(
+  () => activeBids.value.filter((b) => mapStatus(b.status) === 'winning').length,
+)
+const outbidBids = computed(
+  () => activeBids.value.filter((b) => mapStatus(b.status) === 'outbid').length,
+)
 </script>
 
 <style scoped>
