@@ -26,6 +26,7 @@
             <input type="number" class="bid-input" placeholder="0.00" v-model="bidAmount" />
           </div>
           <button class="bid-button" @click="placeBid">Bid</button>
+          <button class="bid-button" @click="pay">Pay</button>
         </div>
       </div>
     </div>
@@ -70,7 +71,9 @@ const placeBid = () => {
       return
     }
     if (bidAmount.value < props.currentBid + props.bidIncrement) {
-      toast.error(`Bid must be at least ${formatCurrency(props.currentBid + props.bidIncrement)} to meet the minimum increment.`)
+      toast.error(
+        `Bid must be at least ${formatCurrency(props.currentBid + props.bidIncrement)} to meet the minimum increment.`,
+      )
       return
     }
 
@@ -78,6 +81,8 @@ const placeBid = () => {
     bidAmount.value = null
   }
 }
+
+const pay = () => {}
 </script>
 
 <style scoped>

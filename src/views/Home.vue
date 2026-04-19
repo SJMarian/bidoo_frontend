@@ -7,17 +7,21 @@
       </div>
       <div class="demo-auctions">
         <h2>Auction Items</h2>
-        <div class="auction-grid">
+        <div class="auction-grid" v-if="auctionItems.length > 0">
           <AuctionItemCard
-            title="Vintage Rolex Submariner"
-            description="Rare 1980s Rolex Submariner in excellent condition with original box and papers."
-            imageUrl="https://images.unsplash.com/photo-1523170335258-f5ed11844a49?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-            :currentBid="12500"
-            :bidsCount="14"
-            :isLive="true"
-            @bid="handleBid"
-            :bidIncrement="500"
+            v-for="item in auctionItems"
+            :key="item.id"
+            :title="item.title"
+            :description="item.description"
+            :imageUrl="getImageUrl(item.image)"
+            :currentBid="item.currentHighestBid"
+            :isLive="item.status === 'LIVE'"
+            @bid="(amount) => handleBid(amount, item.id)"
+            :bidIncrement="item.minimumBidIncrement"
           />
+        </div>
+        <div v-else class="no-items">
+          <p>No auction items available at the moment.</p>
         </div>
       </div>
     </main>
@@ -25,11 +29,56 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import AppNavbar from '../components/AppNavbar.vue'
 import AuctionItemCard from '../components/AuctionItemCard.vue'
+import apiClient from '../api/apiClient'
 
-const handleBid = (amount: number) => {
-  alert(`Bid of $${amount} placed!`)
+interface AuctionItemResponse {
+  id: number
+  title: string
+  description: string
+  image: string
+  currentHighestBid: number
+  status: string
+  timeLeft: number
+  minimumBidIncrement: number
+}
+
+const auctionItems = ref<AuctionItemResponse[]>([])
+
+const fetchItems = async () => {
+  try {
+    const response = await apiClient.get('auction/items-others')
+    if (response.data && Array.isArray(response.data.data)) {
+      auctionItems.value = response.data.data
+    } else if (Array.isArray(response.data)) {
+      auctionItems.value = response.data
+    } else if (response.data && Array.isArray(response.data.content)) {
+      auctionItems.value = response.data.content
+    } else {
+      auctionItems.value = []
+    }
+  } catch (error) {
+    console.error('Failed to fetch auction items:', error)
+  }
+}
+
+onMounted(() => {
+  fetchItems()
+})
+
+const getImageUrl = (image: string | null) => {
+  if (!image) return ''
+  if (image.startsWith('http')) return image
+
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1/'
+  const host = baseUrl.replace(/\/api\/v1\/?$/, '')
+  return `${host}/${image.startsWith('/') ? image.substring(1) : image}`
+}
+
+const handleBid = (amount: number, itemId: number) => {
+  alert(`Bid of $${amount} placed on item ${itemId}!`)
 }
 </script>
 
@@ -98,5 +147,15 @@ const handleBid = (amount: number) => {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
+}
+
+.no-items {
+  text-align: center;
+  padding: 3rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  color: #64748b;
+  font-size: 1.125rem;
 }
 </style>
