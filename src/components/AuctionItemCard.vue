@@ -37,8 +37,10 @@
 import { ref } from 'vue'
 import { Radio } from 'lucide-vue-next'
 import { useToast } from '../composables/useToast'
+import router from '@/router'
 
 const props = defineProps<{
+  id: number
   title: string
   description: string
   imageUrl: string
@@ -52,6 +54,7 @@ const bidAmount = ref<number | null>(null)
 
 const emit = defineEmits<{
   (e: 'bid', amount: number): void
+  (e: 'pay'): void
 }>()
 
 const toast = useToast()
@@ -82,7 +85,9 @@ const placeBid = () => {
   }
 }
 
-const pay = () => {}
+const pay = () => {
+  router.push(`/checkout/${props.id}`)
+}
 </script>
 
 <style scoped>

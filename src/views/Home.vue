@@ -11,12 +11,14 @@
           <AuctionItemCard
             v-for="item in auctionItems"
             :key="item.id"
+            :id="item.id"
             :title="item.title"
             :description="item.description"
             :imageUrl="getImageUrl(item.image)"
             :currentBid="item.currentHighestBid"
             :isLive="item.status === 'LIVE'"
             @bid="(amount) => handleBid(amount, item.id)"
+            @pay="handlePay(item.id)"
             :bidIncrement="item.minimumBidIncrement"
           />
         </div>
@@ -30,9 +32,12 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import AppNavbar from '../components/AppNavbar.vue'
 import AuctionItemCard from '../components/AuctionItemCard.vue'
 import apiClient from '../api/apiClient'
+
+const router = useRouter()
 
 interface AuctionItemResponse {
   id: number
@@ -79,6 +84,10 @@ const getImageUrl = (image: string | null) => {
 
 const handleBid = (amount: number, itemId: number) => {
   alert(`Bid of $${amount} placed on item ${itemId}!`)
+}
+
+const handlePay = (itemId: number) => {
+  router.push(`/checkout/${itemId}`)
 }
 </script>
 

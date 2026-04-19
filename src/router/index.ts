@@ -8,6 +8,7 @@ const Login = () => import('../views/auth/Login.vue')
 const Register = () => import('../views/auth/Register.vue')
 const MyBids = () => import('../views/MyBids.vue')
 const CreateAuction = () => import('../views/CreateAuction.vue')
+const Checkout = () => import('../views/Checkout.vue')
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -38,6 +39,12 @@ const routes: Array<RouteRecordRaw> = [
     path: '/home/create-auction',
     name: 'CreateAuction',
     component: CreateAuction,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/checkout/:id',
+    name: 'Checkout',
+    component: Checkout,
     meta: { requiresAuth: true },
   },
 ]
