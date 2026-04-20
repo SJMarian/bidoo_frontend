@@ -52,8 +52,10 @@
               </div>
             </div>
 
-            <button class="proceed-btn" @click="proceedPayment">
-              <ShieldCheck class="icon" :size="20" /> Proceed to Secure Payment
+            <button class="proceed-btn" @click="proceedPayment" :disabled="isProcessing">
+              <ShieldCheck class="icon" :size="20" />
+              <span v-if="isProcessing">Processing...</span>
+              <span v-else>Proceed to Secure Payment</span>
             </button>
             <p class="disclaimer">
               By clicking 'Proceed', you will be redirected to the SSLCommerz hosted payment page to
@@ -134,6 +136,7 @@ interface CheckoutSummary {
 
 const summaryData = ref<CheckoutSummary | null>(null)
 const loading = ref(true)
+const isProcessing = ref(false)
 
 const fetchSummary = async () => {
   try {
@@ -164,8 +167,27 @@ const goBack = () => {
   router.push('/')
 }
 
-const proceedPayment = () => {
-  alert('Redirecting to SSLCommerz...')
+const proceedPayment = async () => {
+  if (!auctionItemId) return
+  isProcessing.value = true
+  try {
+    const response = await apiClient.post('/orders', {
+      auctionItemId: Number(auctionItemId)
+    })
+    
+    if (response.data && response.data.data) {
+      // Redirect to the SSLCommerz payment page
+      window.location.href = response.data.data
+    } else {
+      console.error('Invalid response format:', response.data)
+      alert('Failed to get payment link. Please try again later.')
+    }
+  } catch (error) {
+    console.error('Failed to initiate payment:', error)
+    alert('An error occurred while initiating payment.')
+  } finally {
+    isProcessing.value = false
+  }
 }
 
 const formatCurrency = (amount: number) => {

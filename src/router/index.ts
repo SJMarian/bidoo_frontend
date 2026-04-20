@@ -9,6 +9,9 @@ const Register = () => import('../views/auth/Register.vue')
 const MyBids = () => import('../views/MyBids.vue')
 const CreateAuction = () => import('../views/CreateAuction.vue')
 const Checkout = () => import('../views/Checkout.vue')
+const PaymentSuccess = () => import('../views/PaymentSuccess.vue')
+const PaymentCancel = () => import('../views/PaymentCancel.vue')
+const PaymentFail = () => import('../views/PaymentFail.vue')
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -45,6 +48,24 @@ const routes: Array<RouteRecordRaw> = [
     path: '/checkout/:id',
     name: 'Checkout',
     component: Checkout,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/payment-success',
+    name: 'PaymentSuccess',
+    component: PaymentSuccess,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/payment-cancel',
+    name: 'PaymentCancel',
+    component: PaymentCancel,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/payment-fail',
+    name: 'PaymentFail',
+    component: PaymentFail,
     meta: { requiresAuth: true },
   },
 ]
