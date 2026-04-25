@@ -128,22 +128,25 @@ const formatCurrency = (amount: number) => {
   return `$${amount.toFixed(2)}`
 }
 
-const formatTimeLeft = (seconds: number) => {
-  if (seconds == null) return 'N/A'
-  if (seconds <= 0) return 'Ended'
-  const h = Math.floor(seconds / 3600)
-  const m = Math.floor((seconds % 3600) / 60)
-  const s = Math.floor(seconds % 60)
+const formatTimeLeft = (milliseconds: number) => {
+  if (milliseconds == null) return 'N/A'
+  if (milliseconds <= 0) return 'Ended'
+
+  const totalSeconds = Math.floor(milliseconds / 1000)
+  const h = Math.floor(totalSeconds / 3600)
+  const m = Math.floor((totalSeconds % 3600) / 60)
+  const s = totalSeconds % 60
+
   return `${h > 0 ? h + 'h ' : ''}${m}m ${s}s`
 }
 
 const mapStatus = (status: string) => {
   // BidSummaryRow expects 'winning' or 'outbid'.
-  return status === 'LIVE' ? 'winning' : 'outbid'
+  return status === 'ACTIVE' ? 'winning' : 'outbid'
 }
 
 const getActionType = (status: string) => {
-  return status === 'LIVE' ? 'bid' : 'view'
+  return status === 'ACTIVE' ? 'bid' : 'view'
 }
 
 const handleActionClick = (bid: AuctionItemResponse) => {

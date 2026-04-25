@@ -1,12 +1,53 @@
 <template>
   <div class="dashboard-page">
     <AppNavbar />
+
     <main class="dashboard-content">
       <div class="header">
         <h1>Home</h1>
       </div>
+
+      <div class="filter-card">
+        <h2>Search & Filter Auctions</h2>
+
+        <div class="filter-grid">
+          <input v-model="filters.keyword" placeholder="Search title..." />
+
+          <select v-model="filters.status">
+            <option value="">All Status</option>
+            <option value="UPCOMING">Upcoming</option>
+            <option value="ACTIVE">Active</option>
+            <option value="CLOSED">Closed</option>
+            <option value="PAID">Paid</option>
+          </select>
+
+          <input v-model.number="filters.minPrice" type="number" placeholder="Min price" />
+          <input v-model.number="filters.maxPrice" type="number" placeholder="Max price" />
+
+          <select v-model="filters.endingSoon">
+            <option value="">Any Ending Time</option>
+            <option value="true">Ending Soon</option>
+          </select>
+
+          <input v-model.number="filters.minBids" type="number" placeholder="Minimum bids" />
+
+          <select v-model="selectedCurrency">
+            <option value="BDT">BDT</option>
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="GBP">GBP</option>
+          </select>
+        </div>
+
+        <div class="filter-actions">
+          <button @click="searchItems">Apply Filters</button>
+          <button class="secondary" @click="resetFilters">Reset</button>
+        </div>
+      </div>
+
       <div class="demo-auctions">
         <h2>Auction Items</h2>
+
         <div class="auction-grid" v-if="auctionItems.length > 0">
           <AuctionItemCard
             v-for="item in auctionItems"
@@ -15,15 +56,19 @@
             :title="item.title"
             :description="item.description"
             :imageUrl="getImageUrl(item.image)"
-            :currentBid="item.currentHighestBid"
-            :isLive="item.status === 'LIVE'"
+            :currentBid="getDisplayBid(item)"
+            :originalBid="item.currentHighestBid"
+            :currency="item.currency"
+            :status="item.status"
+            :isLive="item.status === 'ACTIVE'"
+            :bidIncrement="item.minimumBidIncrement"
             @bid="(amount) => handleBid(amount, item.id)"
             @pay="handlePay(item.id)"
-            :bidIncrement="item.minimumBidIncrement"
           />
         </div>
+
         <div v-else class="no-items">
-          <p>No auction items available at the moment.</p>
+          <p>No auction items available.</p>
         </div>
       </div>
     </main>
@@ -31,13 +76,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import AppNavbar from '../components/AppNavbar.vue'
 import AuctionItemCard from '../components/AuctionItemCard.vue'
 import apiClient from '../api/apiClient'
+import { useToast } from '../composables/useToast'
 
 const router = useRouter()
+const toast = useToast()
 
 interface AuctionItemResponse {
   id: number
@@ -48,30 +95,105 @@ interface AuctionItemResponse {
   status: string
   timeLeft: number
   minimumBidIncrement: number
+  currency?: string
 }
 
 const auctionItems = ref<AuctionItemResponse[]>([])
+const convertedPrices = ref<Record<number, number>>({})
+const selectedCurrency = ref('BDT')
+
+const filters = reactive({
+  keyword: '',
+  status: '',
+  minPrice: null as number | null,
+  maxPrice: null as number | null,
+  endingSoon: '',
+  minBids: null as number | null,
+})
 
 const fetchItems = async () => {
   try {
     const response = await apiClient.get('auction/items-others')
-    if (response.data && Array.isArray(response.data.data)) {
-      auctionItems.value = response.data.data
-    } else if (Array.isArray(response.data)) {
-      auctionItems.value = response.data
-    } else if (response.data && Array.isArray(response.data.content)) {
-      auctionItems.value = response.data.content
-    } else {
-      auctionItems.value = []
-    }
+    auctionItems.value = response.data?.data || []
+    await convertAllPrices()
   } catch (error) {
     console.error('Failed to fetch auction items:', error)
   }
 }
 
-onMounted(() => {
-  fetchItems()
-})
+const searchItems = async () => {
+  try {
+    const params: any = {}
+
+    if (filters.status) params.status = filters.status
+    if (filters.minPrice !== null) params.minPrice = filters.minPrice
+    if (filters.maxPrice !== null) params.maxPrice = filters.maxPrice
+    if (filters.endingSoon) params.endingSoon = filters.endingSoon
+    if (filters.minBids !== null) params.minBids = filters.minBids
+
+    const response = await apiClient.get('auction/search', { params })
+    let items = response.data?.data || []
+
+    if (filters.keyword.trim()) {
+      const keyword = filters.keyword.toLowerCase()
+      items = items.filter((item: AuctionItemResponse) =>
+        item.title.toLowerCase().includes(keyword) ||
+        item.description.toLowerCase().includes(keyword)
+      )
+    }
+
+    auctionItems.value = items
+    await convertAllPrices()
+  } catch (error) {
+    console.error('Failed to search auctions:', error)
+    toast.error('Failed to search auctions')
+  }
+}
+
+const resetFilters = async () => {
+  filters.keyword = ''
+  filters.status = ''
+  filters.minPrice = null
+  filters.maxPrice = null
+  filters.endingSoon = ''
+  filters.minBids = null
+  await fetchItems()
+}
+
+const convertAllPrices = async () => {
+  convertedPrices.value = {}
+
+  for (const item of auctionItems.value) {
+    try {
+      const fromCurrency = item.currency || 'BDT'
+
+      if (fromCurrency === selectedCurrency.value) {
+        convertedPrices.value[item.id] = item.currentHighestBid
+        continue
+      }
+
+      const response = await apiClient.get('currency/convert', {
+        params: {
+          amount: item.currentHighestBid,
+          from: fromCurrency,
+          to: selectedCurrency.value,
+        },
+      })
+
+      convertedPrices.value[item.id] = response.data?.data || item.currentHighestBid
+    } catch {
+      convertedPrices.value[item.id] = item.currentHighestBid
+    }
+  }
+}
+
+watch(selectedCurrency, convertAllPrices)
+
+const getDisplayBid = (item: AuctionItemResponse) => {
+  return convertedPrices.value[item.id] ?? item.currentHighestBid
+}
+
+onMounted(fetchItems)
 
 const getImageUrl = (image: string | null) => {
   if (!image) return ''
@@ -82,8 +204,18 @@ const getImageUrl = (image: string | null) => {
   return `${host}/${image.startsWith('/') ? image.substring(1) : image}`
 }
 
-const handleBid = (amount: number, itemId: number) => {
-  alert(`Bid of $${amount} placed on item ${itemId}!`)
+const handleBid = async (amount: number, itemId: number) => {
+  try {
+    await apiClient.post('bids', {
+      auctionItemId: itemId,
+      bidAmount: amount,
+    })
+
+    toast.success('Bid placed successfully')
+    await searchItems()
+  } catch (err: any) {
+    toast.error(err.response?.data?.message || 'Failed to place bid')
+  }
 }
 
 const handlePay = (itemId: number) => {
@@ -113,32 +245,50 @@ const handlePay = (itemId: number) => {
   color: #0f172a;
 }
 
-.content-body {
+.filter-card {
   background: white;
-  padding: 2rem;
+  padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  margin-bottom: 2rem;
 }
 
-.content-body p {
-  color: #475569;
-  margin-bottom: 1.5rem;
-  font-size: 1.125rem;
+.filter-card h2 {
+  margin-bottom: 1rem;
+  color: #1e293b;
 }
 
-.logout-btn {
-  background-color: #ef4444;
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.filter-grid input,
+.filter-grid select {
+  padding: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+}
+
+.filter-actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.filter-actions button {
+  background: #197fe6;
   color: white;
   border: none;
-  padding: 0.5rem 1.25rem;
-  border-radius: 6px;
-  font-weight: 600;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.2s;
 }
 
-.logout-btn:hover {
-  background-color: #dc2626;
+.filter-actions .secondary {
+  background: #64748b;
 }
 
 .demo-auctions {
@@ -163,8 +313,6 @@ const handlePay = (itemId: number) => {
   padding: 3rem;
   background: white;
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   color: #64748b;
-  font-size: 1.125rem;
 }
 </style>

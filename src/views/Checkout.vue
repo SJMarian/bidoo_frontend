@@ -69,6 +69,13 @@
           <div class="card summary-card">
             <h2>Order Summary</h2>
 
+            <select v-model="selectedCurrency" class="currency-select">
+              <option value="BDT">BDT</option>
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+              <option value="GBP">GBP</option>
+            </select>
+
             <div class="summary-line">
               <span>Winning Bid</span>
               <span>{{ formatCurrency(summaryData.soldPrice) }}</span>
@@ -137,6 +144,7 @@ interface CheckoutSummary {
 const summaryData = ref<CheckoutSummary | null>(null)
 const loading = ref(true)
 const isProcessing = ref(false)
+const selectedCurrency = ref('BDT')
 
 const fetchSummary = async () => {
   try {
@@ -193,7 +201,7 @@ const proceedPayment = async () => {
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'USD',
+    currency: selectedCurrency.value,
   }).format(amount)
 }
 
@@ -550,5 +558,13 @@ const totalAmount = computed(() => {
   border-radius: 1rem;
   color: #64748b;
   font-weight: 500;
+}
+
+.currency-select {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
 }
 </style>

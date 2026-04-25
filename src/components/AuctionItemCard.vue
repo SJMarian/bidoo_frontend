@@ -1,7 +1,7 @@
 <template>
   <div class="auction-card group">
     <div class="image-wrapper">
-      <div v-if="isLive" class="badge-live"><Radio class="btn-icon" :size="18" />LIVE</div>
+      <div v-if="isLive" class="badge-live"><Radio class="btn-icon" :size="18" />ACTIVE</div>
       <div v-if="bidsCount !== undefined" class="badge-bids">{{ bidsCount }} Bids</div>
       <div
         class="card-image"
@@ -12,17 +12,20 @@
 
     <div class="card-content">
       <h3 class="card-title">{{ title }}</h3>
+      <span class="status-badge" :class="status?.toLowerCase()">
+        {{ status }}
+      </span>
       <p class="card-desc">{{ description }}</p>
 
       <div class="card-footer">
         <div class="bid-info">
           <span class="bid-label">Current Bid</span>
-          <span class="bid-amount">{{ formatCurrency(currentBid) }}</span>
+          <span class="bid-amount">{{ currency || 'BDT' }} {{ currentBid?.toFixed(2) }}</span>
         </div>
 
         <div class="bid-action">
           <div class="input-wrapper">
-            <span class="currency-symbol">$</span>
+            <span class="currency-symbol">{{ currency || 'BDT' }}</span>
             <input type="number" class="bid-input" placeholder="0.00" v-model="bidAmount" />
           </div>
           <button class="bid-button" @click="placeBid">Bid</button>
@@ -45,8 +48,10 @@ const props = defineProps<{
   description: string
   imageUrl: string
   currentBid: number
-  bidsCount?: number
-  isLive?: boolean
+  originalBid?: number
+  currency?: string
+  status?: string
+  isLive: boolean
   bidIncrement: number
 }>()
 
@@ -258,5 +263,34 @@ const pay = () => {
 
 .bid-button:hover {
   opacity: 0.9;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.status-badge.upcoming {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-badge.active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-badge.closed {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-badge.paid {
+  background: #dbeafe;
+  color: #1e40af;
 }
 </style>

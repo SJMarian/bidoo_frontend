@@ -15,7 +15,7 @@
 
     <div class="navbar-right">
       <nav class="nav-links">
-        <a href="#" class="active">Live</a>
+        <a href="#" class="active">Active</a>
         <a href="#">Upcoming</a>
         <a href="#">Past</a>
         <router-link to="/home/my-bids" active-class="active">My Bids</router-link>

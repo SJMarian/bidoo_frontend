@@ -6,7 +6,7 @@
     </div>
     <nav class="nav-links">
       <a href="#how-it-works">How it Works</a>
-      <a href="#live-auctions">Live Auctions</a>
+      <a href="#live-auctions">Active Auctions</a>
       <a href="#support">Support</a>
     </nav>
     <div class="nav-actions">
