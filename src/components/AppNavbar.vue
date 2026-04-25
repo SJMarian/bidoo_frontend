@@ -7,10 +7,6 @@
         </div>
         <span class="logo-text">Elite Auction</span>
       </router-link>
-      <div class="search-bar">
-        <Search class="search-icon" :size="18" />
-        <input type="text" placeholder="Search luxury assets..." class="search-input" />
-      </div>
     </div>
 
     <div class="navbar-right">
@@ -36,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { Gavel, Search, Bell, LogOut } from 'lucide-vue-next'
+import { Gavel, Bell, LogOut } from 'lucide-vue-next'
 import { useAuthStore } from '../auth/authStore'
 import { useRouter } from 'vue-router'
 
@@ -96,33 +92,6 @@ const logout = () => {
   color: #0f172a;
   letter-spacing: -0.015em;
   white-space: nowrap;
-}
-
-.search-bar {
-  display: flex;
-  align-items: center;
-  background-color: #f8fafc;
-  border-radius: 8px;
-  height: 40px;
-  padding: 0 1rem;
-  width: 250px;
-}
-
-.search-icon {
-  color: #64748b;
-  margin-right: 0.5rem;
-}
-
-.search-input {
-  border: none;
-  background: transparent;
-  outline: none;
-  font-size: 0.875rem;
-  width: 100%;
-}
-
-.search-input::placeholder {
-  color: #64748b;
 }
 
 .nav-links {
@@ -201,7 +170,6 @@ const logout = () => {
 }
 
 @media (max-width: 768px) {
-  .search-bar,
   .nav-links {
     display: none;
   }

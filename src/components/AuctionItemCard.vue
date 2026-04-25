@@ -18,18 +18,34 @@
       <p class="card-desc">{{ description }}</p>
 
       <div class="card-footer">
-        <div class="bid-info">
-          <span class="bid-label">Current Bid</span>
-          <span class="bid-amount">{{ currency || 'BDT' }} {{ currentBid?.toFixed(2) }}</span>
+        <div class="price-section">
+          <p class="price-label">CURRENT BID</p>
+
+          <h3 class="current-price">
+            {{ currency || 'BDT' }} {{ Number(currentBid || 0).toFixed(2) }}
+          </h3>
+
+          <p v-if="originalBid !== undefined" class="base-price">
+            Original price: {{ baseCurrency || 'BDT' }} {{ Number(originalBid || 0).toFixed(2) }}
+          </p>
         </div>
 
-        <div class="bid-action">
-          <div class="input-wrapper">
-            <span class="currency-symbol">{{ currency || 'BDT' }}</span>
-            <input type="number" class="bid-input" placeholder="0.00" v-model="bidAmount" />
-          </div>
-          <button class="bid-button" @click="placeBid">Bid</button>
-          <button class="bid-button" @click="pay">Pay</button>
+        <div class="bid-action-row">
+          <input
+            v-model.number="bidAmount"
+            type="number"
+            class="bid-input"
+            :placeholder="minimumBid.toFixed(2)"
+            :disabled="!isLive"
+          />
+
+          <button class="bid-btn" @click="submitBid" :disabled="!isLive">
+            Bid
+          </button>
+
+          <button class="pay-btn" @click="$emit('pay')" :disabled="status !== 'CLOSED' && status !== 'PAID'">
+            Pay
+          </button>
         </div>
       </div>
     </div>
@@ -37,10 +53,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { Radio } from 'lucide-vue-next'
-import { useToast } from '../composables/useToast'
-import router from '@/router'
 
 const props = defineProps<{
   id: number
@@ -50,6 +64,7 @@ const props = defineProps<{
   currentBid: number
   originalBid?: number
   currency?: string
+  baseCurrency?: string
   status?: string
   isLive: boolean
   bidIncrement: number
@@ -62,36 +77,23 @@ const emit = defineEmits<{
   (e: 'pay'): void
 }>()
 
-const toast = useToast()
+const minimumBid = computed(() => {
+  const baseBid = props.originalBid ?? props.currentBid ?? 0
+  return baseBid + props.bidIncrement
+})
 
-const formatCurrency = (val: number) => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-  }).format(val)
-}
+const submitBid = () => {
+  if (bidAmount.value === null) return
 
-const placeBid = () => {
-  if (bidAmount.value) {
-    if (bidAmount.value <= props.currentBid) {
-      toast.error('Bid must be greater than the current bid.')
-      return
-    }
-    if (bidAmount.value < props.currentBid + props.bidIncrement) {
-      toast.error(
-        `Bid must be at least ${formatCurrency(props.currentBid + props.bidIncrement)} to meet the minimum increment.`,
-      )
-      return
-    }
+  const baseBid = props.originalBid ?? props.currentBid ?? 0
+  const minimum = baseBid + props.bidIncrement
 
-    emit('bid', bidAmount.value)
-    bidAmount.value = null
+  if (bidAmount.value < minimum) {
+    alert(`Bid must be at least BDT ${minimum.toFixed(2)}`)
+    return
   }
-}
 
-const pay = () => {
-  router.push(`/checkout/${props.id}`)
+  emit('bid', bidAmount.value)
 }
 </script>
 
@@ -189,80 +191,73 @@ const pay = () => {
 
 .card-footer {
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-}
-
-.bid-info {
-  display: flex;
   flex-direction: column;
+  align-items: flex-start;
 }
 
-.bid-label {
-  color: #94a3b8;
-  font-size: 0.625rem;
-  text-transform: uppercase;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+.price-section {
+  margin-top: 1rem;
 }
 
-.bid-amount {
-  color: #197fe6;
-  font-size: 1.25rem;
+.price-label {
+  font-size: 0.75rem;
   font-weight: 800;
+  letter-spacing: 0.12em;
+  color: #94a3b8;
+  margin-bottom: 0.4rem;
 }
 
-.bid-action {
+.current-price {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #197fe6;
+  line-height: 1.2;
+  margin: 0;
+  word-break: break-word;
+}
+
+.base-price {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-top: 0.4rem;
+}
+
+.bid-action-row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-}
-
-.input-wrapper {
-  position: relative;
-}
-
-.currency-symbol {
-  position: absolute;
-  left: 0.5rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #94a3b8;
-  font-size: 0.75rem;
+  gap: 0.75rem;
+  margin-top: 1rem;
 }
 
 .bid-input {
-  width: 5.5rem;
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.5rem;
-  padding: 0.5rem 0.5rem 0.5rem 1.25rem;
-  font-size: 0.875rem;
-  outline: none;
-  color: #0f172a;
+  width: 130px;
+  height: 46px;
+  padding: 0 0.75rem;
+  border: 1px solid #dbe3ef;
+  border-radius: 10px;
+  font-size: 1rem;
+  color: #334155;
   box-sizing: border-box;
 }
 
-.bid-input:focus {
-  border-color: #197fe6;
-  background-color: #ffffff;
-  box-shadow: 0 0 0 1px #197fe6;
-}
-
-.bid-button {
-  background-color: #197fe6;
-  color: white;
-  padding: 0.5rem 0.75rem;
+.bid-btn,
+.pay-btn {
+  height: 46px;
+  padding: 0 1.2rem;
   border: none;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 700;
+  border-radius: 10px;
+  background: #197fe6;
+  color: white;
+  font-weight: 800;
+  font-size: 1rem;
   cursor: pointer;
-  transition: opacity 0.2s;
 }
 
-.bid-button:hover {
-  opacity: 0.9;
+.bid-btn:disabled,
+.pay-btn:disabled,
+.bid-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .status-badge {
