@@ -78,7 +78,7 @@
             <div class="form-group">
               <label>Currency</label>
               <select v-model="form.currency">
-                <option value="USD">BDT - Bangladeshi Taka</option>
+                <option value="BDT">BDT - Bangladeshi Taka</option>
                 <option value="USD">USD - US Dollar</option>
                 <option value="EUR">EUR - Euro</option>
                 <option value="GBP">GBP - British Pound</option>
