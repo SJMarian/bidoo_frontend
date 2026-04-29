@@ -88,6 +88,9 @@ interface AuctionItemResponse {
   currentHighestBid: number
   status: string
   timeLeft: number
+  minimumBidIncrement?: number
+  totalBids?: number
+  currency?: string
 }
 
 const activeBids = ref<AuctionItemResponse[]>([])

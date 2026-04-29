@@ -68,6 +68,7 @@ const props = defineProps<{
   status?: string
   isLive: boolean
   bidIncrement: number
+  bidsCount?: number
 }>()
 
 const bidAmount = ref<number | null>(null)
