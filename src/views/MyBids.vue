@@ -66,6 +66,62 @@
           </table>
         </div>
       </div>
+
+      <div class="table-container">
+        <div class="table-header">
+          <h2>Items Won</h2>
+        </div>
+        <div class="table-responsive">
+          <table class="bids-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Title</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in wonItems" :key="item.id">
+                <td>
+                  <div class="item-info">
+                    <div class="item-img" :style="{ backgroundImage: `url(${getImageUrl(item.image)})` }"></div>
+                  </div>
+                </td>
+                <td>
+                  <span class="item-name">{{ item.title }}</span>
+                </td>
+                <td>
+                  <span class="status-pill badge-green">
+                    <span class="dot" style="background-color: #22c55e;"></span>
+                    {{ item.status }}
+                  </span>
+                </td>
+                <td>
+                  <button
+                    v-if="item.status === 'CLOSED'"
+                    class="btn-action-primary"
+                    @click="handlePay(item)"
+                  >
+                    Pay
+                  </button>
+                  <button
+                    v-else
+                    class="btn-action-primary"
+                    style="background-color: #94a3b8; cursor: not-allowed;"
+                    disabled
+                  >
+                    No action
+                  </button>
+                </td>
+              </tr>
+              <tr v-if="wonItems.length === 0">
+                <td colspan="4" style="text-align: center; color: #64748b;">No won items yet</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </main>
   </div>
 </template>
@@ -91,6 +147,7 @@ interface AuctionItemResponse {
 }
 
 const activeBids = ref<AuctionItemResponse[]>([])
+const wonItems = ref<AuctionItemResponse[]>([])
 
 const fetchBids = async () => {
   try {
@@ -110,9 +167,32 @@ const fetchBids = async () => {
   }
 }
 
+const fetchWonItems = async () => {
+  try {
+    const response = await apiClient.get('auction/items-won')
+    if (response.data && Array.isArray(response.data.data)) {
+      wonItems.value = response.data.data
+    } else if (Array.isArray(response.data)) {
+      wonItems.value = response.data
+    } else if (response.data && Array.isArray(response.data.content)) {
+      wonItems.value = response.data.content
+    } else {
+      console.log('No won items found')
+      wonItems.value = []
+    }
+  } catch (error) {
+    console.error('Failed to fetch won items:', error)
+  }
+}
+
 onMounted(() => {
   fetchBids()
+  fetchWonItems()
 })
+
+const handlePay = (item: AuctionItemResponse) => {
+  router.push(`/checkout/${item.id}`)
+}
 
 const getImageUrl = (image: string | null) => {
   if (!image) return ''
