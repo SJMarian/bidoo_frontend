@@ -63,7 +63,7 @@
             :status="item.status"
             :isLive="item.status === 'ACTIVE'"
             :bidIncrement="item.minimumBidIncrement"
-            @bid="(amount) => handleBid(amount, item.id)"
+            @refresh="searchItems"
             @pay="handlePay(item.id)"
           />
         </div>
@@ -203,20 +203,6 @@ const getImageUrl = (image: string | null) => {
   const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1/'
   const host = baseUrl.replace(/\/api\/v1\/?$/, '')
   return `${host}/${image.startsWith('/') ? image.substring(1) : image}`
-}
-
-const handleBid = async (amount: number, itemId: number) => {
-  try {
-    await apiClient.post('bids', {
-      auctionItemId: itemId,
-      bidAmount: amount,
-    })
-
-    toast.success('Bid placed successfully')
-    await searchItems()
-  } catch (err: any) {
-    toast.error(err.response?.data?.message || 'Failed to place bid')
-  }
 }
 
 const handlePay = (itemId: number) => {

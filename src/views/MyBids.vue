@@ -229,7 +229,7 @@ const mapStatus = (status: string) => {
 }
 
 const getActionType = (status: string) => {
-  return status === 'ACTIVE' ? 'bid' : 'view'
+  return 'view'
 }
 
 const handleActionClick = (bid: AuctionItemResponse) => {

@@ -55,6 +55,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { Radio } from 'lucide-vue-next'
+import apiClient from '../api/apiClient'
+import { useToast } from '../composables/useToast'
 
 const props = defineProps<{
   id: number
@@ -72,9 +74,10 @@ const props = defineProps<{
 }>()
 
 const bidAmount = ref<number | null>(null)
+const toast = useToast()
 
 const emit = defineEmits<{
-  (e: 'bid', amount: number): void
+  (e: 'refresh'): void
   (e: 'pay'): void
 }>()
 
@@ -83,18 +86,35 @@ const minimumBid = computed(() => {
   return baseBid + props.bidIncrement
 })
 
-const submitBid = () => {
+const submitBid = async () => {
   if (bidAmount.value === null) return
 
   const baseBid = props.originalBid ?? props.currentBid ?? 0
   const minimum = baseBid + props.bidIncrement
 
   if (bidAmount.value < minimum) {
-    alert(`Bid must be at least BDT ${minimum.toFixed(2)}`)
+    toast.error(`Bid must be at least BDT ${minimum.toFixed(2)}`)
     return
   }
 
-  emit('bid', bidAmount.value)
+  try {
+    const response = await apiClient.post('bids', {
+      auctionItemId: props.id,
+      bidAmount: bidAmount.value,
+    })
+
+    const data = response.data?.data || response.data
+    if (data && data.message) {
+      toast.success(data.message)
+    } else {
+      toast.success('Bid placed successfully')
+    }
+
+    bidAmount.value = null
+    emit('refresh')
+  } catch (err: any) {
+    toast.error(err.response?.data?.message || 'Failed to place bid')
+  }
 }
 </script>
 
